@@ -5,8 +5,8 @@ Allows you to add song name, artist info, comments, a starting tempo, and a volu
 
 I originally wrote the majority of this in two days (July 27-28) with some minor bugfixes done within a span of two more days (July 29-30).
 
-# Contents
+## Contents
 This repository includes the conversion tool and documentation for the ProTracker IFF format, excluding the MOD format documentation.
 
-# Tests done
+## Tests done
 Works correctly with blank fields.
