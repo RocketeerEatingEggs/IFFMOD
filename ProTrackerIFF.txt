@@ -1,0 +1,39 @@
+This is a documentation of each chunk in the ProTracker IFF format, which was introduced in
+ProTracker 3.6.
+
+For the readers who know what an IFF chunk is, you're on the right track, but for those of
+you who don't know what IFF chunks are, there are 4 bytes that tell you the name of the
+chunk (in ASCII). After that is a 32-bit big-endian value that determines the length of the
+chunk. After that is the content of the chunk. Chunks can go one after another, and due to
+this design, they can (theoretically) even be nested!
+
+But let's not goof around and talk about each and every chunk here, shall we?
+
+FORM:	this chunk contains the entire file. Inside this chunk, before the VERS chunk, is
+	the string "MODL".
+VERS:	this 10-byte long section contains the version. Should be justified on the right.
+INFO:	This contains the following:
+	off	len	(both in decimal) (all offsets are from start of chunk)
+	0	32	song name.
+	32	2	number of instruments. (all multibyte areas are big-endian)
+	34	2	number of orders.
+	36	2	number of patterns.
+	38	2	volume. Can be used to override a tracker's pre-determined volume.
+	40	2	tempo. Can be used to override the 125 constant default of
+			ProTracker.
+	42	2	flags.
+			+256	I do not know what this is supposed to be for, but it's
+				enabled in almost every ProTracker IFF module.
+			+2048	CIA timing. Turn this off to enable VBlank timing.
+	44	2	The day of the date the module was last saved.
+	46	2	The month of the date the module was last saved.
+	48	2	The year of the date the module was last saved.
+	50	2	The hour of the time the module was last saved.
+	52	2	The minute of the time the module was last saved.
+	54	2	The second of the time the module was last saved.
+	THE FOLLOWING WILL ALWAYS BE 0 WHEN CONVERTED WITH IFFMOD:
+	56	2	The hour part of the song's length.
+	58	2	The minute part of the song's length.
+	60	2	The second part of the song's length.
+	62	2	The millisecond part of the song's length.
+PTDT:	The actual MOD itself.
