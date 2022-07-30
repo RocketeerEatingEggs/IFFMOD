@@ -9,7 +9,7 @@ I originally wrote the majority of this in two days (July 27-28) with some minor
 This repository includes the conversion tool and documentation for the ProTracker IFF format, excluding the MOD format documentation.
 
 ## Requirements
-This code requires Python 3.10 to run.
+This code requires Python 3.10.x to run.
 
 ## Tests done
 Works correctly with blank fields.
