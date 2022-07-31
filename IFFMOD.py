@@ -14,6 +14,7 @@ def convMOD():
     modComment = commentObject.get("1.0", "end")
     modTempo = tempoObject.get()
     modVolume = volumeObject.get()
+    useVBlank = vBlankCheckVal.get()
     newModFile = filedialog.asksaveasfile(mode='wb',defaultextension='pt36',filetypes=['"ProTracker IFF" {.pt36}'])
     with open(openedFilename, "rb") as openedFile:
         oldModFile = openedFile.read()
@@ -40,7 +41,10 @@ def convMOD():
     tempo = int(modTempo).to_bytes(2, byteorder='big')
     newModFile.write(bytes(volume))
     newModFile.write(bytes(tempo))
-    newModFile.write(b"\x81\x00")
+    flags = int(128)
+    if useVBlank == 0:
+        flags = flags + 1
+    newModFile.write(flags.to_bytes(2, byteorder='little'))
     day = int(datetime.utcnow().day).to_bytes(2, byteorder='big')
     mon = int(datetime.utcnow().month).to_bytes(2, byteorder='big')
     yr = int(datetime.utcnow().year - 1900).to_bytes(2, byteorder='big')
@@ -101,4 +105,8 @@ volumeSpinVal = StringVar()
 volumeObject = Spinbox(otherSettings, from_=0, to=64, textvariable=volumeSpinVal)
 volumeObject.set(64)
 volumeObject.grid(column=1, row=1)
+Label(otherSettings, text='ONLY SET THESE IF YOU KNOW WHAT YOU ARE DOING:').grid(column=1, row=2)
+vBlankCheckVal = IntVar()
+vBlankObject = Checkbutton(otherSettings, text='Use VBlank', variable=vBlankCheckVal)
+vBlankObject.grid(column=1, row=3)
 mainWindow.mainloop()
