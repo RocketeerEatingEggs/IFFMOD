@@ -6,12 +6,12 @@ from tkinter import scrolledtext
 from datetime import datetime
 def convMOD():
     blankString = ""
-    openedFilename = filedialog.askopenfilename(filetypes=['"ProTracker" {.mod}'])
+    openedFilename = filedialog.askopenfilename(filetypes=['"ProTracker and compatible" {.mod}'])
     if openedFilename == "":
         return 0
-    modName = nameObject.get("1.0", "end")
-    modArtist = artistObject.get("1.0", "end")
-    modComment = commentObject.get("1.0", "end")
+    modName = nameObject.get("1.0", "end").strip("\x0A")
+    modArtist = artistObject.get("1.0", "end").strip("\x0A")
+    modComment = commentObject.get("1.0", "end") # no stripping this time
     modTempo = tempoObject.get()
     modVolume = volumeObject.get()
     useVBlank = vBlankCheckVal.get()
@@ -31,7 +31,7 @@ def convMOD():
     newModFile.write(b"\x46\x4F\x52\x4D\x43\x4D\x4E\x54\x4D\x4F\x44\x4C\x56\x45\x52\x53")
     newModFile.write(b"\x00\x00\x00\x16\x00\x00\x00\x00\x49\x46\x46\x4D\x4F\x44\x49\x4E")
     newModFile.write(b"\x46\x4F\x00\x00\x00\x48")
-    newModFile.write(bytes(modName.ljust(32), encoding="utf-8"))
+    newModFile.write(bytes(modName.ljust(32, "\x00"), encoding="iso-8859-1"))
     newModFile.write(b"\x00\x1F")
     ordrs = int(numOrders).to_bytes(2, byteorder='big')
     newModFile.write(bytes(ordrs))
@@ -60,12 +60,12 @@ def convMOD():
     newModFile.write(b"\x00\x00\x00\x00\x00\x00\x00\x00\x43\x4D\x4E\x54")
     commentsTable = []
     for line in modComment.split('\n'):
-        commentsTable.append(line.ljust(40))
+        commentsTable.append(line.ljust(40, "\x00"))
     newCmnt = blankString.join(commentsTable)
     commentLen = len(newCmnt) + 40
     newModFile.write(commentLen.to_bytes(4, byteorder='big'))
-    newModFile.write(bytes(modArtist.ljust(32), encoding="utf-8"))
-    newModFile.write(bytes(newCmnt, encoding="utf-8"))
+    newModFile.write(bytes(modArtist.ljust(32), encoding="iso-8859-1"))
+    newModFile.write(bytes(newCmnt, encoding="iso-8859-1"))
     newModFile.write(b"\x50\x54\x44\x54\x4F\x44\x49\x4E")
     PTDTPosition = newModFile.tell() - 4
     newModFile.write(oldModFile)
@@ -78,6 +78,37 @@ def convMOD():
     newModFile.write(bytes(newModSizeBytes))
     newModFile.close()
     messagebox.showinfo(title='Addition complete',message='The extra information has been added to your file.')
+def stripHeader():
+    blankString = ""
+    openedFilename = filedialog.askopenfilename(filetypes=['"ProTracker IFF" {.pt36}'])
+    if openedFilename == "":
+        return 0
+    newModFile = filedialog.asksaveasfile(mode='wb',defaultextension='mod',filetypes=['"ProTracker and compatible" {.mod}'])
+    with open(openedFilename, "rb") as openedFile:
+        openedFile.seek(8)
+        magic = str(openedFile.read(4), encoding="iso-8859-1")
+        if magic != "MODL":
+            messagebox.showinfo(title='Not a valid file',message='This is not a valid ProTracker IFF file.')
+        else:
+            if str(openedFile.read(4), encoding="iso-8859-1") != "VERS":
+                messagebox.showinfo(title='Not a valid file',message='This file is incorrectly ordered. Chunk should be "VERS".')
+                return 0
+            openedFile.seek(14, 1) # not needed
+            if str(openedFile.read(4), encoding="iso-8859-1") != "INFO":
+                messagebox.showinfo(title='Not a valid file',message='This file is incorrectly ordered. Chunk should be "INFO".')
+                return 0
+            openedFile.seek(68, 1) # not needed, again
+            if str(openedFile.read(4), encoding="iso-8859-1") != "CMNT":
+                messagebox.showinfo(title='Not a valid file',message='This file is incorrectly ordered. Chunk should be "CMNT".')
+                return 0
+            lenCMNT = int.from_bytes(openedFile.read(4), byteorder='big') # needed this time
+            openedFile.seek(lenCMNT - 8, 1) # we already read those 8 bytes
+            if str(openedFile.read(4), encoding="iso-8859-1") != "PTDT":
+                messagebox.showinfo(title='Not a valid file',message='This file is incorrectly ordered. Chunk should be "PTDT".')
+                return 0
+            openedFile.seek(4, 1) # don't care about the length
+            newModFile.write(openedFile.read()) # write the read!
+            messagebox.showinfo(title='Removal complete',message='The information has been stripped from your file.')
 mainWindow = Tk()
 frm = Frame(mainWindow, padding=10)
 frm.grid()
@@ -109,4 +140,5 @@ Label(otherSettings, text='ONLY SET THESE IF YOU KNOW WHAT YOU ARE DOING:').grid
 vBlankCheckVal = IntVar()
 vBlankObject = Checkbutton(otherSettings, text='Use VBlank', variable=vBlankCheckVal)
 vBlankObject.grid(column=1, row=3)
+Button(frm, text='Remove info from MOD', command=stripHeader).grid(column=1, row=5)
 mainWindow.mainloop()
