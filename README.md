@@ -12,4 +12,4 @@ This repository includes the conversion tool and documentation for the ProTracke
 This code requires Python 3.10.x to run.
 
 ## Tests done
-Works correctly with blank text fields.
+Works correctly with blank text fields, however pads the song name with spaces.
