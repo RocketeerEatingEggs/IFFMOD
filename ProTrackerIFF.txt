@@ -22,7 +22,7 @@ FORM:	this chunk contains the entire file. Inside this chunk, before the VERS ch
 		38	2	volume. Can be used to override a tracker's pre-determined
 				volume.
 		40	2	tempo. Can be used to override the 125 constant default of
-			ProTracker.
+				ProTracker.
 		42	2	flags.
 			+256	CIA timing. Turn this off to enable VBlank timing.
 			+2048	I do not know what this is supposed to be for, but it's
