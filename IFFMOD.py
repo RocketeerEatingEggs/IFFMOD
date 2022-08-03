@@ -64,7 +64,7 @@ def convMOD():
     newCmnt = blankString.join(commentsTable)
     commentLen = len(newCmnt) + 40
     newModFile.write(commentLen.to_bytes(4, byteorder='big'))
-    newModFile.write(bytes(modArtist.ljust(32), encoding="iso-8859-1"))
+    newModFile.write(bytes(modArtist.ljust(32, "\x00"), encoding="iso-8859-1"))
     newModFile.write(bytes(newCmnt, encoding="iso-8859-1"))
     newModFile.write(b"\x50\x54\x44\x54\x4F\x44\x49\x4E")
     PTDTPosition = newModFile.tell() - 4
@@ -168,6 +168,6 @@ old MODs only, and shouldn't be used in new music.''').grid(column=0, row=8, sti
     Label(aboutWindow, text='''When you're finished adding the info, go to the "Add or Remove" menu and
 select "Add info..."''').grid(column=0, row=9, sticky="w")
     Label(aboutWindow, text='''If you want to remove info (no settings necessary), go to that same menu and
-click on "Remove info...""''').grid(column=0, row=10, sticky="w")
+click on "Remove info..."''').grid(column=0, row=10, sticky="w")
 menubar.add_command(label='About and Help...', command=about)
 mainWindow.mainloop()
