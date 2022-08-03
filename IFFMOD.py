@@ -59,7 +59,7 @@ def convMOD():
     newModFile.write(bytes(sec))
     newModFile.write(b"\x00\x00\x00\x00\x00\x00\x00\x00\x43\x4D\x4E\x54")
     commentsTable = []
-    for line in modComment.split('\n'):
+    for line in modComment.rstrip('\n').split('\n'):
         commentsTable.append(line.ljust(40, "\x00"))
     newCmnt = blankString.join(commentsTable)
     commentLen = len(newCmnt) + 40
