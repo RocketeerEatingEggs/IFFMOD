@@ -1,5 +1,6 @@
 This is a documentation of each chunk in the ProTracker IFF format, which was introduced in
-ProTracker 3.6. For an example of a ProTracker IFF file, see snus.mod on The Mod Archive.
+ProTracker 3.6. For an example of a ProTracker IFF file, see Solaris' snus.mod on The Mod
+Archive.
 
 For the readers who know what an IFF chunk is, you're on the right track, but for those of
 you who don't know what IFF chunks are, there are 4 bytes that tell you the name of the
