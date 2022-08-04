@@ -1,5 +1,5 @@
 This is a documentation of each chunk in the ProTracker IFF format, which was introduced in
-ProTracker 3.6.
+ProTracker 3.6. For an example of a ProTracker IFF file, see snus.mod on The Mod Archive.
 
 For the readers who know what an IFF chunk is, you're on the right track, but for those of
 you who don't know what IFF chunks are, there are 4 bytes that tell you the name of the
@@ -40,3 +40,6 @@ FORM:	this chunk contains the entire file. Inside this chunk, before the VERS ch
 		62	2	The millisecond part of the song's length.
 	PTDT:	The actual MOD itself. Read this chunk using your existing MOD loader, if
 		you have one.
+			The only difference that seems to exist in the header-stripped MOD
+			file is that at 1080-1084, it should be "M.K.", but ProTracker 3.6
+			uses "PATT" instead.
