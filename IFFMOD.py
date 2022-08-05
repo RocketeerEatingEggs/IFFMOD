@@ -11,7 +11,7 @@ def convMOD():
         return 0
     modName = nameObject.get("1.0", "end").strip("\x0A")
     modArtist = artistObject.get("1.0", "end").strip("\x0A")
-    modComment = commentObject.get("1.0", "end") # no stripping this time
+    modComment = commentObject.get("1.0", "end")
     modTempo = tempoObject.get()
     modVolume = volumeObject.get()
     useVBlank = vBlankCheckVal.get()
@@ -59,8 +59,9 @@ def convMOD():
     newModFile.write(bytes(sec))
     newModFile.write(b"\x00\x00\x00\x00\x00\x00\x00\x00\x43\x4D\x4E\x54")
     commentsTable = []
-    for line in modComment.rstrip('\n').split('\n'):
+    for line in modComment.split('\n'):
         commentsTable.append(line.ljust(40, "\x00"))
+    commentsTable.pop()
     newCmnt = blankString.join(commentsTable)
     commentLen = len(newCmnt) + 40
     newModFile.write(commentLen.to_bytes(4, byteorder='big'))
@@ -78,37 +79,6 @@ def convMOD():
     newModFile.write(bytes(newModSizeBytes))
     newModFile.close()
     messagebox.showinfo(title='Addition complete',message='The extra information has been added to your file.')
-def stripHeader():
-    blankString = ""
-    openedFilename = filedialog.askopenfilename(filetypes=['"ProTracker IFF" {.pt36}'])
-    if openedFilename == "":
-        return 0
-    newModFile = filedialog.asksaveasfile(mode='wb',defaultextension='mod',filetypes=['"ProTracker and compatible" {.mod}'])
-    with open(openedFilename, "rb") as openedFile:
-        openedFile.seek(8)
-        magic = str(openedFile.read(4), encoding="iso-8859-1")
-        if magic != "MODL":
-            messagebox.showinfo(title='Not a valid file',message='This is not a valid ProTracker IFF file.')
-        else:
-            if str(openedFile.read(4), encoding="iso-8859-1") != "VERS":
-                messagebox.showinfo(title='Not a valid file',message='This file is incorrectly ordered. Chunk should be "VERS".')
-                return 0
-            openedFile.seek(14, 1) # not needed
-            if str(openedFile.read(4), encoding="iso-8859-1") != "INFO":
-                messagebox.showinfo(title='Not a valid file',message='This file is incorrectly ordered. Chunk should be "INFO".')
-                return 0
-            openedFile.seek(68, 1) # not needed, again
-            if str(openedFile.read(4), encoding="iso-8859-1") != "CMNT":
-                messagebox.showinfo(title='Not a valid file',message='This file is incorrectly ordered. Chunk should be "CMNT".')
-                return 0
-            lenCMNT = int.from_bytes(openedFile.read(4), byteorder='big') # needed this time
-            openedFile.seek(lenCMNT - 8, 1) # we already read those 8 bytes
-            if str(openedFile.read(4), encoding="iso-8859-1") != "PTDT":
-                messagebox.showinfo(title='Not a valid file',message='This file is incorrectly ordered. Chunk should be "PTDT".')
-                return 0
-            openedFile.seek(4, 1) # don't care about the length
-            newModFile.write(openedFile.read()) # write the read!
-            messagebox.showinfo(title='Removal complete',message='The information has been stripped from your file.')
 mainWindow = Tk()
 frm = Frame(mainWindow, padding=4)
 frm.grid()
@@ -122,7 +92,7 @@ Label(frm, text='Comment').grid(column=0, row=2, sticky="ne")
 commentObject = scrolledtext.ScrolledText(frm, width=40, height=16)
 commentObject.grid(column=1, row=2, sticky="w")
 Label(frm, text='Tempo').grid(column=0, row=3, sticky="e")
-Label(frm, text='(125 is required for most MODs)').grid(column=1, row=3, sticky="e")
+Label(frm, text='(125 is required for most old MODs)').grid(column=1, row=3, sticky="e")
 tempoSpinVal = StringVar()
 tempoObject = Spinbox(frm, from_=32, to=255, textvariable=tempoSpinVal)
 tempoObject.set(125)
@@ -134,16 +104,6 @@ volumeObject = Spinbox(frm, from_=0, to=64, textvariable=volumeSpinVal)
 volumeObject.set(48)
 volumeObject.grid(column=1, row=4, sticky="w")
 frm.option_add('*tearOff', FALSE)
-menubar = Menu(mainWindow)
-menu_file = Menu(menubar)
-menu_checks = Menu(menubar)
-menubar.add_cascade(menu=menu_file, label='Add or Remove')
-menu_file.add_command(label='Add info...', command=convMOD)
-menu_file.add_command(label='Remove info...', command=stripHeader)
-menubar.add_cascade(menu=menu_checks, label='Checkboxes')
-vBlankCheckVal = IntVar()
-menu_checks.add_checkbutton(label='Use VBlank', variable=vBlankCheckVal, onvalue=1, offvalue=0)
-mainWindow['menu'] = menubar
 mainWindow.title("IFFMOD")
 mainWindow.resizable(FALSE,FALSE)
 def about():
@@ -167,7 +127,12 @@ one time.''').grid(column=0, row=7, sticky="w")
 old MODs only, and shouldn't be used in new music.''').grid(column=0, row=8, sticky="w")
     Label(aboutWindow, text='''When you're finished adding the info, go to the "Add or Remove" menu and
 select "Add info..."''').grid(column=0, row=9, sticky="w")
-    Label(aboutWindow, text='''If you want to remove info (no settings necessary), go to that same menu and
-click on "Remove info..."''').grid(column=0, row=10, sticky="w")
-menubar.add_command(label='About and Help...', command=about)
+menubar = Menu(mainWindow)
+menu_file = Menu(menubar)
+vBlankCheckVal = IntVar()
+menu_file.add_command(label='Add info...', command=convMOD)
+menu_file.add_checkbutton(label='Use VBlank', variable=vBlankCheckVal, onvalue=1, offvalue=0)
+menu_file.add_command(label='About and Help...', command=about)
+menubar.add_cascade(menu=menu_file, label='Menu')
+mainWindow['menu'] = menubar
 mainWindow.mainloop()
