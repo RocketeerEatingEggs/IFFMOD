@@ -1,6 +1,8 @@
+1. What this is
+
 This is a documentation of each chunk in the ProTracker IFF format, which was introduced in
-ProTracker 3.6. For an example of a ProTracker IFF file, see Solaris' debranu.mod on The
-Mod Archive.
+ProTracker 3.6. For an example of a ProTracker IFF file that I (unknowingly) found out in
+the wild, see Solaris' debranu.mod on The Mod Archive.
 
 For the readers who know what an IFF chunk is, you're on the right track, but for those of
 you who don't know what IFF chunks are, there are 4 bytes that tell you the name of the
@@ -8,11 +10,15 @@ chunk (in ASCII). After that is a 32-bit big-endian value that determines the le
 chunk. After that is the content of the chunk. Chunks can go one after another, and due to
 this design, they can (theoretically) even be nested!
 
-But let's not goof around and talk about each and every chunk here, shall we?
+The very first chunk in an IFF file should ALWAYS be a FORM chunk. It contains all other
+chunks, plus a 4-byte identifier string. In the ProTracker IFF format, this string is
+"MODL".
 
-FORM:	this chunk contains the entire file. Inside this chunk, before the VERS chunk, is
-	the string "MODL". This chunk has the following chunks in it:
-	VERS:	this 10-byte long section contains the version. Should be justified on the
+2. Format
+
+FORM:	Read the third paragraph of "What this is".
+	This chunk has the following chunks in it:
+	VERS:	This 10-byte long section contains the version. Should be justified on the
 		right.
 	INFO:	This contains the following:
 		off	len	(both in decimal) (all offsets are from start of chunk)
