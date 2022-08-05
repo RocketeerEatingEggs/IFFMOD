@@ -11,7 +11,7 @@ A gui tool for adding the info.
 A command line tool for removing the info.
 
 ### IFFMODall.py
-A gui tool for adding and removing the info.
+A gui tool for adding and removing the info. This is for if you don't care and want all of it.
 
 ## Requirements
 This code requires Python 3.10.x to run.
