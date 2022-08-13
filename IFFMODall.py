@@ -166,4 +166,6 @@ def stripHeader():
 menu_file.add_command(label='Remove info...', command=stripHeader)
 menubar.add_cascade(menu=menu_file, label='Menu')
 mainWindow['menu'] = menubar
+image = PhotoImage(file='IFFMinprogicon.png')
+mainWindow.iconphoto('-default', image)
 mainWindow.mainloop()
